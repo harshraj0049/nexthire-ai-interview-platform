@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextHire.AI Dashboard</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a modern typeface -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a better dark mode experience */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; /* bg-gray-900 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563; /* bg-gray-600 */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280; /* bg-gray-500 */
+        }
+    </style>
+</head>
+<body class="bg-black text-gray-300 antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-900 flex flex-col p-4 fixed h-full border-r border-slate-800">
+            <div class="flex items-center mb-8">
+                <h1 class="text-2xl font-bold text-white">NextHire.AI</h1>
+            </div>
+            
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-24 h-24 rounded-full bg-gray-700 mb-4 flex items-center justify-center">
+                    <!-- Placeholder for profile picture -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                </div>
+                <h2 class="text-lg font-semibold text-white">{{ name }}</h2>
+            </div>
+
+            <nav class="flex-grow">
+                <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M12 20v-6M6 20v-10M18 20V4"></path></svg>
+                    Start Interview
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 bg-slate-700 text-white rounded-lg transition-colors duration-200 my-1">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    Profile
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                    History
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
+                    Progress
+                </a>
+                 <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 15h1.5a2.5 2.5 0 0 1 0 5H4"></path><path d="M19.5 15H18a2.5 2.5 0 0 1 0 5h1.5"></path><path d="m12 14-4-4"></path><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 14h.01"></path></svg>
+                    Ranking
+                </a>
+            </nav>
+
+            <div class="mt-auto">
+                <form action="/auth/logout" method="POST">
+                <button type="submit" class="flex items-center justify-center w-full px-4 py-3 font-semibold bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    Logout
+                </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 p-6 md:p-10 overflow-y-auto">
+            <header class="mb-8">
+                <div class="flex justify-between items-center flex-wrap gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white">Welcome back, User!</h2>
+                        <p class="text-gray-400 mt-1">Dive into new challenges. You have 3 new notifications.</p>
+                    </div>
+                    <div class="relative">
+                        <input type="text" placeholder="Search..." class="bg-gray-800 border border-gray-700 text-white rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Interview Practice Cards -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+                <!-- Card 1: Technical Interview (SWE) -->
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">Technical Interview (SWE)</h3>
+                        <p class="text-gray-400 mt-1">Practice DS & Algo for SWE roles.</p>
+                    </div>
+                    <div class="mt-6">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-sm text-gray-400">Progress</span>
+                            <span class="text-sm font-semibold text-orange-400">60%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
+                        </div>
+                        <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="DSA">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="CPP">
+                            <button type="submit" class="w-full mt-4 bg-orange-600 text-white font-semibold py-2 rounded-lg hover:bg-orange-700 transition-colors">Start Practicing</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Card 2: HR Interviews -->
+                <div class="bg-gradient-to-br from-purple-600 to-pink-600 p-6 rounded-2xl flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">HR & Behavioral</h3>
+                        <p class="text-purple-200 mt-1">Prepare for culture-fit questions.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Session</button>
+                </div>
+
+                <!-- Card 3: Data Science -->
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">Data Science & ML</h3>
+                        <p class="text-blue-200 mt-1">Tackle stats, modeling, and theory.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Practice</button>
+                </div>
+
+                <!-- Card 4: Analytics -->
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">Business Analytics</h3>
+                        <p class="text-gray-400 mt-1">Solve real-world business cases.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-gray-700 text-white font-semibold py-2 rounded-lg hover:bg-gray-600 transition-colors">Practice Cases</button>
+                </div>
+
+                <!-- Card 5: SQL Developer -->
+                <div class="bg-gradient-to-br from-green-600 to-teal-500 p-6 rounded-2xl flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">SQL Developer</h3>
+                        <p class="text-green-200 mt-1">Advanced queries & database design.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Session</button>
+                </div>
+
+                <!-- Card 6: DevOps -->
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">DevOps & SRE</h3>
+                        <p class="text-gray-400 mt-1">CI/CD, cloud, and infrastructure.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">Practice Scenarios</button>
+                </div>
+
+                <!-- Card 7: Product Manager -->
+                <div class="bg-gray-900 p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">Product Manager</h3>
+                        <p class="text-gray-400 mt-1">Product sense & execution interviews.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-gray-700 text-white font-semibold py-2 rounded-lg hover:bg-gray-600 transition-colors">Start Session</button>
+                </div>
+                
+                <!-- Card 8: System Design -->
+                <div class="bg-gradient-to-br from-indigo-500 to-cyan-500 p-6 rounded-2xl flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300">
+                    <div>
+                        <h3 class="font-bold text-xl text-white">System Design</h3>
+                        <p class="text-indigo-200 mt-1">High-level architecture challenges.</p>
+                    </div>
+                    <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Practice</button>
+                </div>
+
+            </section>
+        </main>
+    </div>
+</body>
+</html>
