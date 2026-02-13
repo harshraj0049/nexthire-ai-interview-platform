@@ -29,8 +29,111 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #6B7280; /* bg-gray-500 */
         }
+        .hidden {
+        display: none;
+        }
+
+        .popup {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        }
+
+        .popup-content {
+        background: #0f172a;
+        color: #fff;
+        padding: 20px 24px;
+        border-radius: 12px;
+        width: 360px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .popup-content h3 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        }
+
+        .disclaimer {
+        font-size: 14px;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+        }
+
+        .choose-file-btn {
+        display: inline-block;
+        padding: 8px 12px;
+        background: #1e293b;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-bottom: 8px;
+        }
+
+        .choose-file-btn:hover {
+        background: #334155;
+        }
+
+        .file-name {
+        font-size: 13px;
+        color: #a5f3fc;
+        margin-top: 6px;
+        }
+
+        .popup-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 16px;
+        }
+
+        .primary-btn {
+        background: #22c55e;
+        color: black;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        }
+
+        .primary-btn:disabled {
+        background: #64748b;
+        cursor: not-allowed;
+        }
+
+        .secondary-btn {
+        background: transparent;
+        color: #cbd5e1;
+        border: none;
+        cursor: pointer;
+        }
     </style>
 </head>
+<!-- Resume Upload Popup -->
+<div id="resumePopup" class="popup hidden">
+  <div class="popup-content">
+    <h3>Resume Upload</h3>
+
+    <p class="disclaimer">
+      Make sure you upload your updated resume.
+      Your resume will be used as context for every interview on our platform.
+    </p>
+
+    <div class="file-section">
+      <span id="chooseFileBtn" class="choose-file-btn">Choose file</span>
+      <input type="file" id="resumeInput" accept=".pdf" hidden />
+      <div id="fileName" class="file-name"></div>
+    </div>
+
+    <div class="popup-actions">
+      <button id="cancelUpload" class="secondary-btn">Cancel</button>
+      <button id="uploadBtn" class="primary-btn" disabled>Upload</button>
+    </div>
+  </div>
+</div>
+
 <body class="bg-black text-gray-300 antialiased">
 
     <div class="flex h-screen overflow-hidden">
@@ -49,10 +152,6 @@
             </div>
 
             <nav class="flex-grow">
-                <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M12 20v-6M6 20v-10M18 20V4"></path></svg>
-                    Start Interview
-                </a>
                 <a href="#" class="flex items-center px-4 py-3 bg-slate-700 text-white rounded-lg transition-colors duration-200 my-1">
                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Profile
@@ -69,6 +168,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 15h1.5a2.5 2.5 0 0 1 0 5H4"></path><path d="M19.5 15H18a2.5 2.5 0 0 1 0 5h1.5"></path><path d="m12 14-4-4"></path><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 14h.01"></path></svg>
                     Ranking
                 </a>
+                <div id="uploadResumeTrigger"  class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200">
+                    Upload Resume
+                </div>
             </nav>
 
             <div class="mt-auto">
@@ -115,7 +217,7 @@
                         <form action="/mock_interview/start" method="POST">
                             <input type="hidden" name="interview_type" value="DSA">
                             <input type="hidden" name="difficulty" value="MEDIUM">
-                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="mode" value="MAANG">
                             <input type="hidden" name="language" value="CPP">
                             <button type="submit" class="w-full mt-4 bg-orange-600 text-white font-semibold py-2 rounded-lg hover:bg-orange-700 transition-colors">Start Practicing</button>
                         </form>
@@ -128,7 +230,13 @@
                         <h3 class="font-bold text-xl text-white">HR & Behavioral</h3>
                         <p class="text-purple-200 mt-1">Prepare for culture-fit questions.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="HR & Behavioral">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="NA">
                     <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Session</button>
+                    </form>
                 </div>
 
                 <!-- Card 3: Data Science -->
@@ -137,7 +245,13 @@
                         <h3 class="font-bold text-xl text-white">Data Science & ML</h3>
                         <p class="text-blue-200 mt-1">Tackle stats, modeling, and theory.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="Data Science & ML">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="PYTHON">
                     <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Practice</button>
+                    </form>
                 </div>
 
                 <!-- Card 4: Analytics -->
@@ -146,6 +260,11 @@
                         <h3 class="font-bold text-xl text-white">Business Analytics</h3>
                         <p class="text-gray-400 mt-1">Solve real-world business cases.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="Business Analytics">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="NA">
                     <button class="w-full mt-4 bg-gray-700 text-white font-semibold py-2 rounded-lg hover:bg-gray-600 transition-colors">Practice Cases</button>
                 </div>
 
@@ -155,7 +274,13 @@
                         <h3 class="font-bold text-xl text-white">SQL Developer</h3>
                         <p class="text-green-200 mt-1">Advanced queries & database design.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="SQL Developer">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="SQL">
                     <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Session</button>
+                    </form>
                 </div>
 
                 <!-- Card 6: DevOps -->
@@ -164,7 +289,13 @@
                         <h3 class="font-bold text-xl text-white">DevOps & SRE</h3>
                         <p class="text-gray-400 mt-1">CI/CD, cloud, and infrastructure.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="DevOps & SRE">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="NA">
                     <button class="w-full mt-4 bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors">Practice Scenarios</button>
+                    </form>
                 </div>
 
                 <!-- Card 7: Product Manager -->
@@ -173,7 +304,13 @@
                         <h3 class="font-bold text-xl text-white">Product Manager</h3>
                         <p class="text-gray-400 mt-1">Product sense & execution interviews.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="Product Manager">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="STARTUPS">
+                            <input type="hidden" name="language" value="NA">
                     <button class="w-full mt-4 bg-gray-700 text-white font-semibold py-2 rounded-lg hover:bg-gray-600 transition-colors">Start Session</button>
+                    </form>
                 </div>
                 
                 <!-- Card 8: System Design -->
@@ -182,6 +319,11 @@
                         <h3 class="font-bold text-xl text-white">System Design</h3>
                         <p class="text-indigo-200 mt-1">High-level architecture challenges.</p>
                     </div>
+                    <form action="/mock_interview/start" method="POST">
+                            <input type="hidden" name="interview_type" value="System Design">
+                            <input type="hidden" name="difficulty" value="MEDIUM">
+                            <input type="hidden" name="mode" value="MAANG">
+                            <input type="hidden" name="language" value="JAVA/CPP/PYTHON">
                     <button class="w-full mt-4 bg-white/20 text-white font-semibold py-2 rounded-lg hover:bg-white/30 backdrop-blur-sm transition-colors">Start Practice</button>
                 </div>
 
@@ -189,4 +331,77 @@
         </main>
     </div>
 </body>
+<script>
+    const uploadTrigger = document.getElementById("uploadResumeTrigger");
+    const popup = document.getElementById("resumePopup");
+
+    const chooseFileBtn = document.getElementById("chooseFileBtn");
+    const resumeInput = document.getElementById("resumeInput");
+    const fileNameDiv = document.getElementById("fileName");
+
+    const uploadBtn = document.getElementById("uploadBtn");
+    const cancelBtn = document.getElementById("cancelUpload");
+
+    let selectedFile = null;
+
+    /* Open popup */
+    uploadTrigger.addEventListener("click", () => {
+    popup.classList.remove("hidden");
+    });
+
+    /* Close popup */
+    cancelBtn.addEventListener("click", () => {
+    resetPopup();
+    });
+
+    /* Open file picker */
+    chooseFileBtn.addEventListener("click", () => {
+    resumeInput.click();
+    });
+
+    /* File selected (browser now holds file) */
+    resumeInput.addEventListener("change", () => {
+    if (resumeInput.files.length === 0) return;
+
+    selectedFile = resumeInput.files[0];
+    fileNameDiv.innerText = selectedFile.name;
+    uploadBtn.disabled = false;
+    });
+
+    /* Upload file to backend */
+    uploadBtn.addEventListener("click", async () => {
+    if (!selectedFile) return;
+
+    uploadBtn.innerText = "Uploading...";
+    uploadBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+        const res = await fetch("/mock_interview/upload_resume", {
+        method: "POST",
+        body: formData
+        });
+
+        if (!res.ok) throw new Error("Upload failed");
+
+        uploadBtn.innerText = "Uploaded ✓";
+        setTimeout(resetPopup, 800);
+    } catch (err) {
+        uploadBtn.innerText = "Upload failed";
+        uploadBtn.disabled = false;
+    }
+    });
+
+    /* Reset popup state */
+    function resetPopup() {
+    popup.classList.add("hidden");
+    selectedFile = null;
+    resumeInput.value = "";
+    fileNameDiv.innerText = "";
+    uploadBtn.innerText = "Upload";
+    uploadBtn.disabled = true;
+    }
+</script>
 </html>

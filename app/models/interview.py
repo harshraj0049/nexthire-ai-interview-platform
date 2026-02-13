@@ -17,3 +17,9 @@ class Interview(Base):
     ended_at=Column(DateTime, nullable=True)
     user=relationship("User", back_populates="interviews")
     turn=relationship("InterviewTurn", back_populates="interview")
+    evaluation = relationship(
+        "InterviewEvaluation",
+        back_populates="interview",
+        uselist=False,          # IMPORTANT: one-to-one
+        cascade="all, delete"
+    )

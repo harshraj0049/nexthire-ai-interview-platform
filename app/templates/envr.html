@@ -128,12 +128,52 @@
         }
     </style>
 </head>
+
+<!-- Evaluation Modal -->
+<div id="evaluationModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Interview Evaluation</h2>
+
+    <div class="score-section">
+      <span class="score-label">Overall Score</span>
+      <span id="evalScore" class="score">--</span>
+    </div>
+
+    <div class="eval-block">
+      <h4>Strengths</h4>
+      <p id="evalStrengths"></p>
+    </div>
+
+    <div class="eval-block">
+      <h4>Weaknesses</h4>
+      <p id="evalWeaknesses"></p>
+    </div>
+
+    <div class="eval-block">
+      <h4>Improvements</h4>
+      <p id="evalImprovements"></p>
+    </div>
+
+    <div class="eval-block verdict">
+      <h4>Final Verdict</h4>
+      <p id="evalVerdict"></p>
+    </div>
+
+    <button id="goDashboard" class="primary-btn">
+      Return to Dashboard
+    </button>
+  </div>
+</div>
+
+
 <body>
     <nav>
         <ul>
             <li id="name_logo">NextHire.AI</li>
             <li></li>
-            <li><button class="button" id="end_button"><a href="{{ url_for('dashboard') }}">End</a></button></li>
+            <li>
+                <button class="button" id="end_button">End</button>
+            </li>
             <li id="stptimer">00:00</li>
         </ul>
     </nav>
@@ -219,6 +259,37 @@
       }
     }
   });
+</script>
+<script>
+    const endBtn = document.getElementById("end_button");
+
+endBtn.addEventListener("click", async (e) => {
+  e.preventDefault();
+
+  const res = await fetch(`/mock_interview/${interviewId}/end`, {
+    method: "POST"
+  });
+
+  const data = await res.json();
+
+  showEvaluationPopup(data);
+});
+
+function showEvaluationPopup(data) {
+  document.getElementById("evalScore").innerText = data.score + "/100";
+  document.getElementById("evalStrengths").innerText = data.strengths;
+  document.getElementById("evalWeaknesses").innerText = data.weaknesses;
+  document.getElementById("evalImprovements").innerText = data.improvements;
+  document.getElementById("evalVerdict").innerText = data.final_verdict;
+
+  document.getElementById("evaluationModal").classList.remove("hidden");
+}
+
+document.getElementById("goDashboard").addEventListener("click", () => {
+  window.location.href = `/auth/dash?interview_id=${interviewId}`;
+});
+
+
 </script>
 </body>
 </html>

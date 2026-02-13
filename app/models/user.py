@@ -13,5 +13,7 @@ class User(Base):
     phone_no = Column(String, unique=True, nullable=True)
     created_at=Column(DateTime, default=datetime.utcnow)
     interviews=relationship("Interview", back_populates="user")
+    resume = relationship("UserResume", back_populates="user", uselist=False)
+    
 
 

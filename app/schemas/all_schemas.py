@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from typing import Optional 
 from datetime import datetime
 
@@ -43,4 +43,11 @@ class InterviewTurnResponse(BaseModel):
 
 class CodeSubmitSchema(BaseModel):
     code: str
+
+class InterviewEvaluationSchema(BaseModel):
+    score: int = Field(ge=0, le=100)
+    strengths: str
+    weaknesses: str
+    improvements: str
+    final_verdict: str
 
