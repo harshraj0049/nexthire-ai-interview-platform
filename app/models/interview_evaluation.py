@@ -1,8 +1,9 @@
 from ..database.db import Base
-from sqlalchemy import Column,Integer,String ,ForeignKey
+from sqlalchemy import Column,Integer,ForeignKey,String
 from sqlalchemy.orm import relationship
 from sqlalchemy import DateTime
 from datetime import datetime
+from sqlalchemy.sql import func
 
 class InterviewEvaluation(Base):
     __tablename__="interview_evaluations"
@@ -13,5 +14,5 @@ class InterviewEvaluation(Base):
     weaknesses=Column(String,nullable=False)
     improvements=Column(String,nullable=False)
     final_verdict=Column(String,nullable=False)
-    created_at=Column(DateTime, default=datetime.utcnow)
+    created_at=Column(DateTime(timezone=True), server_default=func.now())
     interview=relationship("Interview", back_populates="evaluation")

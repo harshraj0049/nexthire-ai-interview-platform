@@ -45,14 +45,14 @@ def build_evaluation_prompt(interview, conversation: str) -> str:
 
     Return response strictly in JSON format:
 
-    {
+    {{
     "score": int (0-100),
-    "strengths": "string",
-    "weaknesses": "string",
-    "improvements": "string",
-    "final_verdict": "string"
-    }
-    
+    "strengths": "str",
+    "weaknesses": "str",
+    "improvements": "str",
+    "final_verdict": "str"
+    }}
+
     Interview Type: {interview.interview_type}
     Difficulty: {interview.difficulty}
     Conversation:
