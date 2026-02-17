@@ -156,19 +156,20 @@
                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Profile
                 </a>
-                <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
+                <a href="/auth/history" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
                     History
                 </a>
                 <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>
-                    Progress
+                    Progress (coming Soon)
                 </a>
                  <a href="#" class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200 my-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 15h1.5a2.5 2.5 0 0 1 0 5H4"></path><path d="M19.5 15H18a2.5 2.5 0 0 1 0 5h1.5"></path><path d="m12 14-4-4"></path><path d="M16 10h.01"></path><path d="M12 10h.01"></path><path d="M8 14h.01"></path></svg>
-                    Ranking
+                    Ranking (coming Soon)
                 </a>
                 <div id="uploadResumeTrigger"  class="flex items-center px-4 py-3 text-white rounded-lg hover:bg-slate-800 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path><path d="M12 16v-6"></path><path d="M9 9l3-3 3 3"></path></svg>
                     Upload Resume
                 </div>
             </nav>
@@ -189,11 +190,7 @@
                 <div class="flex justify-between items-center flex-wrap gap-4">
                     <div>
                         <h2 class="text-3xl font-bold text-white">Welcome back, User!</h2>
-                        <p class="text-gray-400 mt-1">Dive into new challenges. You have 3 new notifications.</p>
-                    </div>
-                    <div class="relative">
-                        <input type="text" placeholder="Search..." class="bg-gray-800 border border-gray-700 text-white rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <p class="text-gray-400 mt-1">Dive into new challenges.</p>
                     </div>
                 </div>
             </header>
@@ -207,13 +204,7 @@
                         <p class="text-gray-400 mt-1">Practice DS & Algo for SWE roles.</p>
                     </div>
                     <div class="mt-6">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm text-gray-400">Progress</span>
-                            <span class="text-sm font-semibold text-orange-400">60%</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2">
-                            <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
-                        </div>
+                        
                         <form action="/mock_interview/start" method="POST">
                             <input type="hidden" name="interview_type" value="DSA">
                             <input type="hidden" name="difficulty" value="MEDIUM">

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Chrome, Edge, Safari */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #000;   /* track (background) */
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #1f2937;  /* dark gray thumb */
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #374151;  /* lighter on hover */
+        }
+
+        /* Firefox */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #1f2937 #000;
+        }
+    </style>
+
+</head>
+
+<body class="bg-black text-gray-300 antialiased">
+
+<!-- Evaluation Modal -->
+<div id="evaluationModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+
+  <div class="bg-slate-900 text-gray-200 antialiased rounded-lg w-[500px] max-h-[80vh] shadow-2xl border border-slate-700 flex flex-col">
+
+    <!-- Header -->
+    <div class="p-6 pb-2 border-b border-gray-700">
+      <h2 class="text-xl font-bold">Interview Evaluation</h2>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="overflow-y-auto px-6 py-4 space-y-3 custom-scrollbar">
+
+      <div class="bg-slate-800 shadow-md rounded-md p-2">
+        <span class="font-semibold">Overall Score:</span>
+        <span id="evalScore"></span>
+      </div>
+
+      <div class="bg-slate-800 shadow-md rounded-md p-2">
+        <h4 class="font-semibold">Strengths</h4>
+        <p id="evalStrengths"></p>
+      </div>
+
+      <div class="bg-slate-800 shadow-md rounded-md p-2">
+        <h4 class="font-semibold">Weaknesses</h4>
+        <p id="evalWeaknesses"></p>
+      </div>
+
+      <div class="bg-slate-800 shadow-md rounded-md p-2">
+        <h4 class="font-semibold">Improvements</h4>
+        <p id="evalImprovements"></p>
+      </div>
+
+      <div class="bg-slate-800 shadow-md rounded-md p-2">
+        <h4 class="font-semibold">Final Verdict</h4>
+        <p id="evalVerdict"></p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700 flex justify-end">
+      <button id="closeModal" class="bg-blue-600 text-white px-4 py-2 rounded">
+        Close
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div class="container mx-auto p-4">
+    <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Interview History</h1>
+
+    <button onclick="window.location.href='/auth/dash'"
+        class="bg-gray-800 text-white px-3 py-1 rounded">
+        <strong>Back to Dashboard</strong>
+    </button>
+    </div>
+  <div class="bg-slate-900 shadow-md rounded-lg p-4">
+    {% if history %}
+      <ul>
+        {% for item in history %}
+          <li class="border-b py-3">
+            <p><strong>Interview Type:</strong> {{ item.interview_type }}</p>
+            <p><strong>Mode:</strong> {{ item.mode }}</p>
+            <p><strong>Difficulty:</strong> {{ item.difficulty }}</p>
+            <p><strong>Status:</strong> {{ item.status }}</p>
+            <p><strong>Score:</strong> {{ item.score }}</p>
+            <p><strong>Date:</strong> {{ item.date }}</p>
+
+            {% if item.score == "Pending" %}
+            <button disabled class="bg-gray-400 text-white px-3 py-1 rounded mt-2">
+            Evaluation Pending
+            </button>
+            {% else %}
+            <button class="viewEval bg-gray-800 text-white px-3 py-1 rounded mt-2"
+                    data-id="{{ item.interview_id }}">
+            View Detailed Evaluation
+            </button>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No interview history found.</p>
+    {% endif %}
+  </div>
+</div>
+</body>
+<script>
+document.querySelectorAll(".viewEval").forEach(button => {
+  button.addEventListener("click", async function () {
+    const interviewId = this.dataset.id;
+
+    const res = await fetch(`/auth/history/${interviewId}`);
+    const data = await res.json();
+
+    document.getElementById("evalScore").innerText = data.score + "/100";
+    document.getElementById("evalStrengths").innerText = data.strengths;
+    document.getElementById("evalWeaknesses").innerText = data.weaknesses;
+    document.getElementById("evalImprovements").innerText = data.improvements;
+    document.getElementById("evalVerdict").innerText = data.final_verdict;
+
+    document.getElementById("evaluationModal").classList.remove("hidden");
+  });
+});
+
+document.getElementById("closeModal").addEventListener("click", function () {
+  document.getElementById("evaluationModal").classList.add("hidden");
+});
+</script>
+</html>

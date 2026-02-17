@@ -8,6 +8,8 @@ from . dependencies import get_hashed,verify_password
 from datetime import timedelta
 from . token import create_access_token,ACCESS_TOKEN_EXPIRE_MINUTES
 from .dependencies import get_current_user
+from ..models.interview import Interview
+from ..models.interview_evaluation import InterviewEvaluation
 
 
 router=APIRouter(prefix="/auth", tags=["auth"])
@@ -95,3 +97,55 @@ def logout():
     response = RedirectResponse("/auth/login", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(key="session")
     return response
+
+@router.get("/history",name="history")
+def history(request:Request,
+            current_user=Depends(get_current_user),
+            db:Session=Depends(get_db)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+    interviews = (
+        db.query(Interview)
+        .filter(Interview.user_id == current_user.user_id)
+        .order_by(Interview.created_at.desc())
+        .all()
+    )
+    history_data = []
+    for i in interviews:
+        history_data.append({
+            "interview_id": i.interview_id,
+            "interview_type": i.interview_type,
+            "mode": i.mode,
+            "difficulty": i.difficulty,
+            "status": i.status,
+            "score": i.evaluation.score if i.evaluation else "Pending",
+            "date": i.created_at.strftime("%d %b %Y")
+        })
+
+    return templates.TemplateResponse(
+        "history.html",
+        {"request": request, "history": history_data}
+    )
+
+@router.get("/history/{interview_id}", name="evaluation_detail")
+def evaluation_detail(request: Request, interview_id: int, current_user=Depends(get_current_user), db: Session = Depends(get_db)):
+    if isinstance(current_user, RedirectResponse):
+        return current_user
+
+    evaluation = (
+        db.query(InterviewEvaluation)
+        .join(Interview)
+        .filter(Interview.interview_id == interview_id, Interview.user_id == current_user.user_id)
+        .first()
+    )
+
+    if not evaluation:
+        return RedirectResponse(url="/auth/history", status_code=status.HTTP_303_SEE_OTHER)
+
+    return {
+        "score": evaluation.score,
+        "strengths": evaluation.strengths,
+        "weaknesses": evaluation.weaknesses,
+        "improvements": evaluation.improvements,
+        "final_verdict": evaluation.final_verdict
+    }
