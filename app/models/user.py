@@ -15,6 +15,7 @@ class User(Base):
     created_at=Column(DateTime(timezone=True), server_default=func.now())
     interviews=relationship("Interview", back_populates="user")
     resume = relationship("UserResume", back_populates="user", uselist=False)
+    password_reset_sessions=relationship("PasswordResetSession", back_populates="user")
     
 
 

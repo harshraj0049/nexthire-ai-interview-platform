@@ -18,16 +18,12 @@
         <div id="side_img"><img id="myimg" src="../static/images/side_img.png"></div>
         <div class="form_container">
             <div class="auth_form">
-                <p id="my_para">Welcome back! </p>
-                <form method="POST" action="/auth/login"  enctype="multipart/form-data">
-                    <label class="my_label" for="email">Email</label>
-                    <input type="email" name="email" id="email" placeholder="Enter your email id" required>
-
-                    <label class="my_label" for="password">Password</label>
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
-
-                    <button type="submit" id="submit">Log in</button>
-                    <p class="login">Forgot password? <a class="login" href="/auth/reset_password">Reset password </a></p>
+                <p id="my_para">Verify One Time Password! </p>
+                <form method="POST" action="/auth/verify_otp">
+                    <input type="hidden" name="token" value="{{ token }}">
+                    <label class="my_label" for="otp">One Time Password(6 digits)</label>
+                    <input type="text" name="otp" id="otp" placeholder="Enter the OTP sent to your email" required>
+                    <button type="submit" id="submit">Verify OTP</button>
                 </form>
 
             </div>

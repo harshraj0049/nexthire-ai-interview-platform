@@ -133,6 +133,60 @@
     </div>
   </div>
 </div>
+<!-- Profile Modal -->
+<div id="profileModal"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+
+  <div class="bg-slate-900 text-gray-200 rounded-lg w-[420px] shadow-2xl border border-slate-700">
+
+    <!-- Header -->
+    <div class="p-5 border-b border-gray-700">
+      <h2 class="text-xl font-semibold">User Profile</h2>
+    </div>
+
+    <!-- Content -->
+    <div class="p-5 space-y-3">
+
+      <div class="bg-slate-800 p-3 rounded">
+        <span class="font-semibold">Name:</span>
+        <span id="userName"></span>
+      </div>
+
+      <div class="bg-slate-800 p-3 rounded">
+        <span class="font-semibold">Email:</span>
+        <span id="userEmail"></span>
+      </div>
+
+      <div class="bg-slate-800 p-3 rounded">
+        <span class="font-semibold">Phone:</span>
+        <span id="userPhone"></span>
+      </div>
+
+      <div class="bg-slate-800 p-3 rounded">
+        <span class="font-semibold">Resume Status:</span>
+        <span id="resumeStatus"></span>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="p-4 border-t border-gray-700 flex justify-between">
+
+      <a href="/auth/reset_password"
+         class="bg-blue-600 px-4 py-2 rounded text-white">
+        Reset Password
+      </a>
+
+      <button id="closeProfileBtn"
+              class="bg-gray-600 px-4 py-2 rounded text-white">
+        Close
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
 
 <body class="bg-black text-gray-300 antialiased">
 
@@ -152,7 +206,7 @@
             </div>
 
             <nav class="flex-grow">
-                <a href="#" class="flex items-center px-4 py-3 bg-slate-700 text-white rounded-lg transition-colors duration-200 my-1">
+                <a href="#" id="profileLink" class="flex items-center px-4 py-3 bg-slate-700 text-white rounded-lg transition-colors duration-200 my-1">
                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     Profile
                 </a>
@@ -189,7 +243,7 @@
             <header class="mb-8">
                 <div class="flex justify-between items-center flex-wrap gap-4">
                     <div>
-                        <h2 class="text-3xl font-bold text-white">Welcome back, User!</h2>
+                        <h2 class="text-3xl font-bold text-white">Welcome back, {{ name }}!</h2>
                         <p class="text-gray-400 mt-1">Dive into new challenges.</p>
                     </div>
                 </div>
@@ -395,4 +449,50 @@
     uploadBtn.disabled = true;
     }
 </script>
+<script>
+const openBtn = document.getElementById("profileLink");
+const modal = document.getElementById("profileModal");
+const closeBtn = document.getElementById("closeProfileBtn");
+
+// Open modal + fetch data
+openBtn.addEventListener("click", async () => {
+  try {
+    const res = await fetch("/auth/profile");
+    if (!res.ok) throw new Error("Failed to fetch profile");
+
+    const data = await res.json();
+
+    document.getElementById("userName").innerText = data.name;
+    document.getElementById("userEmail").innerText = data.email;
+    document.getElementById("userPhone").innerText = data.phone_no;
+    document.getElementById("resumeStatus").innerText = data.resume_status;
+
+    modal.classList.remove("hidden");
+
+  } catch (err) {
+    console.error(err);
+    alert("Could not load profile");
+  }
+});
+
+// Close modal button
+closeBtn.addEventListener("click", () => {
+  modal.classList.add("hidden");
+});
+
+// Close when clicking outside
+modal.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.classList.add("hidden");
+  }
+});
+
+// Close with ESC
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    modal.classList.add("hidden");
+  }
+});
+</script>
+
 </html>

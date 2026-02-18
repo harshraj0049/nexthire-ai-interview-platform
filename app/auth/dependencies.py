@@ -6,6 +6,14 @@ from sqlalchemy.orm import Session
 from .. database.db import get_db
 from .. models.user import User
 from . token import SECRET_KEY, ALGORITHM, verify_access_token
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+#mail service imports 
+import smtplib
+from email.message import EmailMessage
 
 pwd_ctx = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 def get_hashed(password:str):
@@ -60,3 +68,14 @@ def get_current_user_api(
         )
 
     return user
+
+def send_password_reset_email(to:str, subject:str, body:str):
+    email=EmailMessage()
+    email["To"] = to
+    email["Subject"] = subject
+    email["From"] = "noreply@NextHire.AI"
+    email.set_content(body)
+
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(os.getenv("SMTP_EMAIL"), os.getenv("SMTP_APP_PASSWORD"))
+        smtp.send_message(email)
