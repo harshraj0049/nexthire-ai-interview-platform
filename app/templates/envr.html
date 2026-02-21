@@ -167,6 +167,23 @@
 
 
 <body>
+    {% if flash %}
+    <div class="flash {{ flash.category }}">
+    <div class="flash-title">
+        {{ flash.category }}
+    </div>
+    <div class="flash-msg">
+        {{ flash.message }}
+    </div>
+    </div>
+
+    <script>
+    setTimeout(() => {
+    const flash = document.querySelector(".flash");
+    if (flash) flash.remove();
+    }, 4000);
+    </script>
+    {% endif %}
     <nav>
         <ul>
             <li id="name_logo">NextHire.AI</li>

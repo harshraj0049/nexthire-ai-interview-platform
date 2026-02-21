@@ -11,9 +11,26 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="..\static\css\auth.css">
+    <link rel="stylesheet" href="/static/css/auth.css">
 </head>
 <body>
+    {% if flash %}
+    <div class="flash {{ flash.category }}">
+    <div class="flash-title">
+        {{ flash.category }}
+    </div>
+    <div class="flash-msg">
+        {{ flash.message }}
+    </div>
+    </div>
+
+    <script>
+    setTimeout(() => {
+    const flash = document.querySelector(".flash");
+    if (flash) flash.remove();
+    }, 4000);
+    </script>
+    {% endif %}
     <div class="container">
         <div id="side_img"><img id="myimg" src="../static/images/side_img.png"></div>
         <div class="form_container">

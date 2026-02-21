@@ -72,3 +72,34 @@ form input{
     margin-top: 20px;
     text-decoration: none;
 }
+.flash{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 260px;
+  max-width: 320px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  z-index: 9999;
+  font-family: Inter, sans-serif;
+}
+
+.flash-title{
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-transform: capitalize;
+}
+
+.flash-msg{
+  font-size: 14px;
+}
+
+/* categories */
+.flash.success{ background:#16a34a; }
+.flash.error{ background:#dc2626; }
+.flash.warning{ background:#facc15; color:black; }
+.flash.info{ background:#1e293b; }
+
+

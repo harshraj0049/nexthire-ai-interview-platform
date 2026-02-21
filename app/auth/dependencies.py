@@ -23,7 +23,7 @@ def verify_password(plain_password,hashed_password):
     return pwd_ctx.verify(plain_password,hashed_password)
 
 def get_current_user(request: Request,db: Session = Depends(get_db)):
-    token = request.cookies.get("session")
+    token = request.cookies.get("access_token")
     if not token:
         return RedirectResponse("/auth/login?error=not_logged_in",status_code=status.HTTP_303_SEE_OTHER)
     try:
@@ -42,7 +42,7 @@ def get_current_user_api(
     request: Request,
     db: Session = Depends(get_db)
 ):
-    token = request.cookies.get("session")
+    token = request.cookies.get("access_token")
 
     if not token:
         raise HTTPException(
