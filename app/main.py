@@ -8,9 +8,13 @@ from sqlalchemy.orm import Session
 from . database.db import get_db
 from . auth import routes as auth_routes
 from . mock_interview import routes as mock_routes
+import logging
 
 
 app=FastAPI()
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s -%(name)s -%(levelname)s -%(message)s')
 
 Base.metadata.create_all(bind=engine)
 

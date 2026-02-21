@@ -5,8 +5,12 @@ let mydiv=document.getElementById("user_container");
 const container=document.getElementById("avatar_container");
 
 let videostream=null;
-let micstream=null;
 let video=null;
+
+if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert("Speech recognition not supported in this browser. Please use Chrome.");
+}
+
 
 camBtn.addEventListener('click', async ()=>{
     if(!videostream){
@@ -51,63 +55,73 @@ camBtn.addEventListener('click', async ()=>{
 })
 
 let recognition;
-let isProcessing = false;
+let micstream = null;
+let isMicOn = false;
+let finalTranscript = "";
 
-micBtn.addEventListener('click', async () => {
-    if (!micstream) {
+micBtn.addEventListener("click", async () => {
+
+    if (!isMicOn) {
+        // 🟢 START LISTENING
         try {
             micstream = await navigator.mediaDevices.getUserMedia({ audio: true });
             micBtn.style.backgroundColor = "red";
-            micstream.getAudioTracks()[0].enabled = true;
+            isMicOn = true;
+            finalTranscript = "";
 
             recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
-            recognition.continuous = false;       // ✅ one utterance
+
+            recognition.lang = "en-US";
+            recognition.continuous = true;
             recognition.interimResults = false;
 
-            recognition.start();
-
-            recognition.onresult = async (event) => {
-                if (isProcessing) return;
-                isProcessing = true;
-
-                const transcript =
-                    event.results[event.results.length - 1][0].transcript;
-
-                document.getElementById('questionBox').value +=
-                    `YOU: ${transcript}\n\n`;
-
-                try {
-                    await sendUserResponse(transcript);
-                    await getNextInterviewerMessage();
-                } catch (err) {
-                    console.error(err);
-                }
-
-                isProcessing = false;
-            };
-
-            recognition.onend = () => {
-                // 🎯 mic stays logically on, but recognition stops cleanly
-                console.log("Speech recognition ended");
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                finalTranscript += transcript + " ";
             };
 
             recognition.onerror = (event) => {
                 console.error("Speech recognition error:", event.error);
-                isProcessing = false;
             };
+
+            recognition.start();
 
         } catch (error) {
             alert(`Microphone access error: ${error}`);
             console.error(error);
         }
+
     } else {
-        micstream.getTracks().forEach(track => track.stop());
-        micstream = null;
+        // 🔴 STOP LISTENING → PROCESS
+        isMicOn = false;
         micBtn.style.backgroundColor = "black";
-        recognition?.stop();
+
+        recognition.stop();
+
+        micstream?.getTracks().forEach(track => track.stop());
+        micstream = null;
+
+        const transcript = finalTranscript.trim();
+
+        if (transcript.length > 0) {
+
+            document.getElementById("questionBox").value +=
+                `YOU: ${transcript}\n\n`;
+
+            try {
+                await sendUserResponse(transcript);
+                await getNextInterviewerMessage();
+            } catch (err) {
+                console.error(err);
+            }
+
+        } else {
+            console.log("No speech detected");
+        }
     }
 });
+
+
 
 
 const evaluateBtn=document.getElementById('eval_btn').addEventListener('click',async ()=>{
@@ -147,12 +161,16 @@ async function getNextInterviewerMessage() {
 
 
 function speakReply(text) {
-    const speech = new SpeechSynthesisUtterance();
-    speech.text = text;
-    speech.lang = 'en-US';
+    window.speechSynthesis.cancel();
+
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-US";
     speech.pitch = 1;
     speech.rate = 1;
+
     window.speechSynthesis.speak(speech);
-  }
+}
+
+
 
 

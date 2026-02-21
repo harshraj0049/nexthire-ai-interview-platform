@@ -12,6 +12,9 @@ from .. models.interview_evaluation import InterviewEvaluation
 from .. models.user_resume import UserResume
 from .. llm.interviewer import build_conversation,get_next_interviewer_message,get_evaluation_interview,build_conversation_for_eval
 from .. llm.resume_summary import summarize_resume_with_gemini
+import logging
+
+logger=logging.getLogger(__name__)
 
 
 router=APIRouter(prefix="/mock_interview", tags=["mock_interview"])
@@ -29,10 +32,11 @@ async def upload_resume(file:UploadFile=File(...),
     if not pdf_bytes:
         raise HTTPException(status_code=400, detail="Empty file uploaded")
     
-    structured_resume = summarize_resume_with_gemini(
+    structured_resume = await summarize_resume_with_gemini(
         file_bytes=pdf_bytes,
         mime_type="application/pdf",
     )
+    logger.info(f"User {current_user.user_id} uploaded resume")
     existing_resume = db.query(UserResume).filter(UserResume.user_id == current_user.user_id).first()
     if existing_resume:
         existing_resume.resume_data = structured_resume
@@ -47,7 +51,7 @@ async def upload_resume(file:UploadFile=File(...),
 
 #api endpoint to start a mock interview
 @router.post("/start", name="start_mock_interview")
-def start_mock_interview(interview_type: str = Form(...),
+async def start_mock_interview(interview_type: str = Form(...),
                         difficulty: str = Form(...),
                         mode: str = Form(...),
                         language: str | None = Form(None),
@@ -74,7 +78,7 @@ def start_mock_interview(interview_type: str = Form(...),
     db.add(first_turn)
     db.commit()
     db.refresh(first_turn)
-
+    logger.info(f"Started interview {interview.interview_id} for user {current_user.user_id}")
     return RedirectResponse(
     url=f"/mock_interview/interview/{interview.interview_id}",
     status_code=status.HTTP_303_SEE_OTHER,
@@ -82,7 +86,7 @@ def start_mock_interview(interview_type: str = Form(...),
 
 #api endpoint for response from interview ui
 @router.post("/{interview_id}/response",status_code=status.HTTP_201_CREATED)
-def respond_to_interview(interview_id:int,
+async def respond_to_interview(interview_id:int,
                          payload:InterviewRespond,
                          db:Session=Depends(get_db),
                          current_user=Depends(get_current_user_api)):
@@ -103,7 +107,7 @@ def respond_to_interview(interview_id:int,
 
 #api endpoint to get next interviewer message
 @router.post("/{interview_id}/next",status_code=status.HTTP_201_CREATED)
-def get_next_response(interview_id:int,
+async def get_next_response(interview_id:int,
                       db:Session=Depends(get_db),
                       current_user=Depends(get_current_user_api)):
     
@@ -130,7 +134,7 @@ def get_next_response(interview_id:int,
     else:
         prompt=build_interview_prompt(interview,conversation)
 
-    next_message=get_next_interviewer_message(prompt)
+    next_message=await get_next_interviewer_message(prompt)
 
     turn=InterviewTurn(interview_id=interview_id,role="INTERVIEWER",content=next_message)
     db.add(turn)
@@ -144,7 +148,7 @@ def get_next_response(interview_id:int,
 
 #api for code check and followup question
 @router.post("/{interview_id}/check")
-def check_code(
+async def check_code(
     interview_id: int,
     payload: CodeSubmitSchema,
     db: Session = Depends(get_db),
@@ -172,7 +176,7 @@ def check_code(
 
     conversation = build_conversation(turns)
 
-    llm_reply = get_next_interviewer_message(conversation)
+    llm_reply =await get_next_interviewer_message(conversation)
 
     turn = InterviewTurn(interview_id=interview_id, role="INTERVIEWER", content=llm_reply)
     db.add(turn)
@@ -185,7 +189,7 @@ def check_code(
     }
 
 @router.post('/{interview_id}/end',status_code=status.HTTP_200_OK,name="end_interview")
-def end_interview(interview_id:int,
+async def end_interview(interview_id:int,
                   db:Session=Depends(get_db),
                   current_user=Depends(get_current_user_api)):
     interview=db.query(Interview).filter(Interview.interview_id==interview_id,
@@ -211,7 +215,7 @@ def end_interview(interview_id:int,
     else:
         evaluation_promt=build_evaluation_prompt(interview,conversation)
 
-        evaluation=get_evaluation_interview(evaluation_promt)
+        evaluation=await get_evaluation_interview(evaluation_promt)
 
         evaluation_db = InterviewEvaluation(
             interview_id=interview_id,
@@ -227,9 +231,7 @@ def end_interview(interview_id:int,
     db.commit()
     db.refresh(evaluation_db)
     db.refresh(interview)
-
-    RedirectResponse(url="/auth/dash",status_code=status.HTTP_303_SEE_OTHER)
-    
+    logger.info(f"Ended interview {interview.interview_id} for user {current_user.user_id}")
     return {
         "score": evaluation_db.score,
         "strengths": evaluation_db.strengths,

@@ -2,7 +2,12 @@
 from . gemini import client
 from google.genai import types
 import json
-def summarize_resume_with_gemini(
+import asyncio
+import logging
+
+logger=logging.getLogger(__name__)
+
+async def summarize_resume_with_gemini(
     *,
     file_bytes: bytes,
     mime_type: str,
@@ -38,26 +43,37 @@ def summarize_resume_with_gemini(
     - No markdown, no explanations
     - Keep the total response under 2000 characters
     """
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[
-            types.Part.from_bytes(
-                data=file_bytes,
-                mime_type=mime_type,
-            ),
-            prompt,
-        ],
-    )
-
-    # Gemini sometimes wraps JSON in markdown
-    text = response.text.strip()
-
-    if text.startswith("```"):
-        text = text.strip("`")
-        text = text[text.find("{"):]
-
+    logger.info("Summarizing resume with Gemini API")
     try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        raise RuntimeError("Gemini returned invalid JSON")
+        response =await asyncio.to_thread(client.models.generate_content,
+            model="gemini-2.5-flash",
+            contents=[
+                types.Part.from_bytes(
+                    data=file_bytes,
+                    mime_type=mime_type,
+                ),
+                prompt,
+            ],
+        )
+        if getattr(response, "error", None):
+            logger.error(
+                f"Gemini error: code={response.error.code}, message={response.error.message}"
+            )
+        text = response.text.strip()
+        if text.startswith("```"):
+            text = text.strip("`")
+            text = text[text.find("{"):]
+
+        try:
+            logger.info("Parsing Gemini response as JSON")
+            return json.loads(text)
+        except json.JSONDecodeError:
+            logger.error("Failed to parse Gemini response as JSON")
+            raise RuntimeError("Gemini returned invalid JSON")
+    except Exception as e:
+            logger.error("Resume summary generation failed", exc_info=True)
+            raise
+
+    
+
+    

@@ -1,11 +1,11 @@
 
 from .gemini import call_gemini_api,evaluate_interview
-def get_next_interviewer_message(prompt: str) -> str:
-    response = call_gemini_api(prompt)
+async def get_next_interviewer_message(prompt: str) -> str:
+    response = await call_gemini_api(prompt)
     return response
 
-def get_evaluation_interview(prompt: str):
-    response = evaluate_interview(prompt)
+async def get_evaluation_interview(prompt: str):
+    response = await evaluate_interview(prompt)
     return response
 
 

@@ -14,6 +14,9 @@ from ..models.user_resume import UserResume
 from ..models.password_reset import PasswordResetSession
 import random
 import datetime
+import logging
+
+logger=logging.getLogger(__name__)
 
 
 router=APIRouter(prefix="/auth", tags=["auth"])
@@ -49,7 +52,7 @@ def register(name:str =Form(...),
         data={"user_id": new_user.user_id},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-
+    logger.info(f"New user registered with user id {new_user.user_id}")
     response = RedirectResponse("/auth/dash", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         key="session",
@@ -78,7 +81,8 @@ def login_submit(
         data={"user_id": user_in_db.user_id},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-
+    logger.info(f"access token created for user {user_in_db.user_id}")
+    logger.info(f"User {user_in_db.user_id} logged in")
     response = RedirectResponse("/auth/dash", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         key="session",
@@ -97,9 +101,10 @@ def dashboard(request:Request,current_user=Depends(get_current_user)):
     return templates.TemplateResponse("dash.html",{"request":request,"user":current_user,"name":current_user.name})
 
 @router.post("/logout",name="logout")
-def logout():
+def logout(current_user=Depends(get_current_user)):
     response = RedirectResponse("/auth/login", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(key="session")
+    logger.info(f"User with user_id {current_user.user_id} logged out")
     return response
 
 @router.get("/history",name="history")
@@ -205,10 +210,12 @@ def verify_otp_submit(token:str=Form(...), otp:str=Form(...),db:Session=Depends(
     if not verify_password(otp, reset_session.otp):
         reset_session.reset_attempts += 1
         db.commit()
+        logger.warning(f"Failed OTP verification attempt {reset_session.reset_attempts} for user {reset_session.user_id}")
         return {"message":"OTP is invalid."}
     
     reset_session.verified = True
     db.commit()
+    logger.info(f"OTP verified for user {reset_session.user_id}")
     response = RedirectResponse(url="/auth/new_password",status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(key="reset_session_id", value=str(reset_session.session_id), httponly=True, max_age=300, samesite="lax",secure=True)
     return response
@@ -226,6 +233,7 @@ def new_password_submit(request:Request, new_password:str=Form(...), db:Session=
     reset_session = db.query(PasswordResetSession).filter(PasswordResetSession.session_id == reset_session_id, PasswordResetSession.verified == True,
                                                           PasswordResetSession.otp_expiry > datetime.datetime.utcnow()).first()
     if not reset_session:
+        logger.warning(f"Unauthorized access attempt to new password page with reset_session_id {reset_session_id}")
         return {"message":"Unauthorized access."}
     
     user_in_db = db.query(user.User).filter(user.User.user_id == reset_session.user_id).first()
@@ -235,7 +243,7 @@ def new_password_submit(request:Request, new_password:str=Form(...), db:Session=
     user_in_db.password_hashed = get_hashed(new_password)
     db.delete(reset_session)
     db.commit()
-
+    logger.info(f"Password reset successful for user {user_in_db.user_id}")
 
     response = RedirectResponse(url="/auth/login", status_code=status.HTTP_303_SEE_OTHER)
     response.delete_cookie(key="reset_session_id")
