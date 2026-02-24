@@ -107,8 +107,9 @@ def get_avg_scores(db,user_id):
         .scalar()
     )
     print(overall_avg)
-    return round(overall_avg,2)
-
+    if overall_avg is None:
+        return 0.0
+    return round(overall_avg, 2)
 
 def recent_3_avg_score(db, user_id):
 

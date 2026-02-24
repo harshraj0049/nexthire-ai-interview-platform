@@ -59,6 +59,7 @@ async def register(request:Request,
         httponly=True,
         max_age=60 * 60 * 24 * 7,
         samesite="lax",
+        secure=True
     )
     return response
 
@@ -88,6 +89,7 @@ async def login_submit(request:Request,
         httponly=True,
         max_age=60 * 60 * 24 * 7,
         samesite="lax",
+        secure=True
     )
     return response
 
@@ -105,7 +107,7 @@ def dashboard(request:Request,current_user=Depends(get_current_user)):
 def logout(request:Request,current_user=Depends(get_current_user)):
     flash_msg(request,"You have been logged out successfully.","success")
     response = RedirectResponse("/auth/login", status_code=status.HTTP_303_SEE_OTHER)
-    response.delete_cookie(key="session")
+    response.delete_cookie(key="access_token")
     logger.info(f"User with user_id {current_user.user_id} logged out")
     return response
 
@@ -221,7 +223,8 @@ def verify_otp_submit(request:Request,token:str=Form(...), otp:str=Form(...),db:
         value=str(reset_session.session_id),
         httponly=True,
         max_age=300,
-        samesite="lax"
+        samesite="lax",
+        secure=True
     )
     return response
 

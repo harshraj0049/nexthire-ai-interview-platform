@@ -9,7 +9,7 @@ import logging
 from ..utils.rate_limit import limiter
 from ..utils.flash import flash_msg,get_flash
 from .services import process_resume_upload,process_interview_start,process_response_to_interviwer,process_get_next_response,process_check_code,process_end_interview,get_interview_for_ui
-
+import time
 logger=logging.getLogger(__name__)
 
 
@@ -51,9 +51,11 @@ async def start_mock_interview(request: Request,
                         mode: str = Form(...),
                         language: str | None = Form(None),
                         db:Session =Depends(get_db),current_user=Depends(get_current_user_api)):
-    
+    start=time.perf_counter()
     interview_id,question = await process_interview_start(db,current_user.user_id,interview_type,difficulty,mode,language)
+    latency=time.perf_counter()-start
     flash_msg(request,"Mock interview started!","success")
+    logger.info(f"Started interview {interview_id} with response time of {latency} sec")
     return RedirectResponse(
     url=f"/mock_interview/interview/{interview_id}",
     status_code=status.HTTP_303_SEE_OTHER,
@@ -81,9 +83,10 @@ async def get_next_response(request: Request,
                       interview_id:int,
                       db:Session=Depends(get_db),
                       current_user=Depends(get_current_user_api)):
-    
+    start=time.perf_counter()
     next_message=await process_get_next_response(request,db,interview_id,current_user.user_id)
-    logger.info(f"Generated next interviewer message for interview {interview_id} and user {current_user.user_id}")
+    latency=time.perf_counter()-start
+    logger.info(f"Generated next interviewer message for interview {interview_id} and user {current_user.user_id} with latency {latency} sec")
     return {
         "role": "INTERVIEWER",
         "content": next_message,
@@ -100,8 +103,10 @@ async def check_code(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user_api)
     ):
+    start=time.perf_counter()
     next_message=await process_check_code(request,db,interview_id,current_user.user_id,payload.code)
-    logger.info(f"Checked code and generated follow-up for interview {interview_id} and user {current_user.user_id}")
+    latency=time.perf_counter()-start
+    logger.info(f"Checked code and generated follow-up for interview {interview_id} and user {current_user.user_id} with latency {latency} sec")
 
     return {
         "role": "INTERVIEWER",
@@ -116,9 +121,10 @@ async def end_interview(request:Request,
                   interview_id: int,
                   db:Session=Depends(get_db),
                   current_user=Depends(get_current_user_api)):
+    start=time.perf_counter()
     evaluation_db=await process_end_interview(db,interview_id,current_user.user_id)
-
-    logger.info(f"Ended interview {interview_id} for user {current_user.user_id}")
+    latency=time.perf_counter()-start
+    logger.info(f"Ended interview {interview_id} for user {current_user.user_id} with overall latency {latency} sec")
     flash_msg(request,"Interview ended! Evaluation generated.","success")
     return {
         "score": evaluation_db.score,

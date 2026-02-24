@@ -4,6 +4,7 @@ import asyncio
 from google import genai
 from dotenv import load_dotenv
 from ..schemas.all_schemas import InterviewEvaluationSchema
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +18,14 @@ async def call_gemini_api(prompt: str) -> str:
     logger.info("Calling Gemini API")
 
     try:
+        start=time.perf_counter()
         response = await asyncio.to_thread(
             client.models.generate_content,
             model="gemini-2.5-flash",
             contents=prompt
         )
-
-        logger.info("Received response from Gemini API")
+        latency=time.perf_counter()-start
+        logger.info(f"Received response from Gemini API with latency{latency:.3f} sec")
 
         if getattr(response, "error", None):
             logger.error(
@@ -41,6 +43,7 @@ async def evaluate_interview(prompt: str) -> InterviewEvaluationSchema:
     logger.info("Evaluating interview with Gemini API")
 
     try:
+        start=time.perf_counter()
         response = await asyncio.to_thread(
             client.models.generate_content,
             model="gemini-2.5-flash",
@@ -50,8 +53,9 @@ async def evaluate_interview(prompt: str) -> InterviewEvaluationSchema:
                 "response_json_schema": InterviewEvaluationSchema.model_json_schema(),
             },
         )
+        latency=time.perf_counter()-start
 
-        logger.info("Received evaluation from Gemini API")
+        logger.info(f"Received evaluation from Gemini API with latency {latency:.3f} sec")
 
         if getattr(response, "error", None):
             logger.error(

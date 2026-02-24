@@ -4,6 +4,7 @@ from google.genai import types
 import json
 import asyncio
 import logging
+import time
 
 logger=logging.getLogger(__name__)
 
@@ -45,6 +46,7 @@ async def summarize_resume_with_gemini(
     """
     logger.info("Summarizing resume with Gemini API")
     try:
+        start=time.perf_counter()
         response =await asyncio.to_thread(client.models.generate_content,
             model="gemini-2.5-flash",
             contents=[
@@ -55,6 +57,8 @@ async def summarize_resume_with_gemini(
                 prompt,
             ],
         )
+        latency=time.perf_counter()-start
+        logger.info(f"Gemini summarised resume with latency :{latency:.3f} sec")
         if getattr(response, "error", None):
             logger.error(
                 f"Gemini error: code={response.error.code}, message={response.error.message}"
