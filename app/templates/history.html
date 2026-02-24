@@ -89,7 +89,8 @@
 <div class="container mx-auto p-4">
     <div class="flex items-center justify-between mb-4">
     <h1 class="text-2xl font-bold">Interview History</h1>
-
+    {% if avg_score %}<h1 class="text-2xl font-bold">Overall Average Score:{{ avg_score }}</h1>{% endif %}
+    {% if recent_avg %}<h1 class="text-2xl font-bold">Average Score(last 3 interviews):{{ avg_score }}</h1>{% endif %}
     <button onclick="window.location.href='/auth/dash'"
         class="bg-gray-800 text-white px-3 py-1 rounded">
         <strong>Back to Dashboard</strong>

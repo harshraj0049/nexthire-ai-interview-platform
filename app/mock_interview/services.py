@@ -57,7 +57,7 @@ async def process_interview_start(db,
     create_turn(db, interview.interview_id, question)
 
     logger.info(f"Started interview {interview.interview_id} for user {user_id}")
-    return interview.interview_id
+    return interview.interview_id,question
 
 #service function to process user response to interviewer
 async def process_response_to_interviwer(db,interview_id,user_id,content):
@@ -74,7 +74,7 @@ async def process_response_to_interviwer(db,interview_id,user_id,content):
     create_user_turn(db,interview_id,content)
 
 #service function to get next interviewer message
-async def process_get_next_response(db,interview_id,user_id):
+async def process_get_next_response(request,db,interview_id,user_id):
     #get interview and validate
     interview=get_interview_for_user(db,interview_id,user_id)
     if not interview:
@@ -100,7 +100,7 @@ async def process_get_next_response(db,interview_id,user_id):
         prompt=build_interview_prompt(interview,conversation)
 
     #get next interviewer message from llm
-    next_message=await safe_llm(None,
+    next_message=await safe_llm(request,
                                 lambda: get_next_interviewer_message(prompt),
                                 flash_text="Sorry,AI is busy. Please try again later.",
                                 fallback="Sorry, I am having trouble generating the next question.")
@@ -110,7 +110,7 @@ async def process_get_next_response(db,interview_id,user_id):
     return next_message
 
 #service function to process code check and followup question
-async def process_check_code(db,interview_id,user_id,code):
+async def process_check_code(request,db,interview_id,user_id,code):
     #getinterview and validate
     interview=get_interview_for_user(db,interview_id,user_id)
     if not interview:
@@ -136,7 +136,7 @@ async def process_check_code(db,interview_id,user_id,code):
     prompt=get_code_evaluation_prompt(conversation)
 
     #get code feedback message from llm
-    next_message=await safe_llm(None,
+    next_message=await safe_llm(request,
                                 lambda: get_next_interviewer_message(prompt),
                                 flash_text="Sorry,AI is busy. Please try again later.",
                                 fallback="Sorry, I am having trouble generating the next question.")
@@ -172,11 +172,10 @@ async def process_end_interview(db,interview_id,user_id):
         #get evalaution from llm
         try:
             evaluation = await get_evaluation_interview(prompt)
+            evaluation_db=get_evaluation_db(interview_id,evaluation)
         except Exception:
             logger.exception("evaluation failed")
             evaluation_db= get_failed_evaluation_db(interview_id)
-        
-        evaluation_db=get_evaluation_db(interview_id,evaluation)
 
     #save evaluation in db
     save_evaluation_in_db(db,evaluation_db)

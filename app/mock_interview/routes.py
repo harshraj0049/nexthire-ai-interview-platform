@@ -52,17 +52,20 @@ async def start_mock_interview(request: Request,
                         language: str | None = Form(None),
                         db:Session =Depends(get_db),current_user=Depends(get_current_user_api)):
     
-    interview_id = await process_interview_start(db,current_user.user_id,interview_type,difficulty,mode,language)
+    interview_id,question = await process_interview_start(db,current_user.user_id,interview_type,difficulty,mode,language)
     flash_msg(request,"Mock interview started!","success")
     return RedirectResponse(
     url=f"/mock_interview/interview/{interview_id}",
     status_code=status.HTTP_303_SEE_OTHER,
-)
+    )
+
 
 
 #api endpoint for response from interview ui
 @router.post("/{interview_id}/response",status_code=status.HTTP_201_CREATED)
-async def respond_to_interview(interview_id:int,
+@limiter.limit("10/minute")
+async def respond_to_interview(request:Request,
+                         interview_id:int,
                          payload:InterviewRespond,
                          db:Session=Depends(get_db),
                          current_user=Depends(get_current_user_api)):
@@ -79,7 +82,7 @@ async def get_next_response(request: Request,
                       db:Session=Depends(get_db),
                       current_user=Depends(get_current_user_api)):
     
-    next_message=await process_get_next_response(db,interview_id,current_user.user_id)
+    next_message=await process_get_next_response(request,db,interview_id,current_user.user_id)
     logger.info(f"Generated next interviewer message for interview {interview_id} and user {current_user.user_id}")
     return {
         "role": "INTERVIEWER",
@@ -97,7 +100,7 @@ async def check_code(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user_api)
     ):
-    next_message=await process_check_code(db,interview_id,current_user.user_id,payload.code)
+    next_message=await process_check_code(request,db,interview_id,current_user.user_id,payload.code)
     logger.info(f"Checked code and generated follow-up for interview {interview_id} and user {current_user.user_id}")
 
     return {
@@ -108,6 +111,7 @@ async def check_code(
 
 #api endpoint to end interview and generate evaluation
 @router.post('/{interview_id}/end',status_code=status.HTTP_200_OK,name="end_interview")
+@limiter.limit("2/minute")
 async def end_interview(request:Request,
                   interview_id: int,
                   db:Session=Depends(get_db),

@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from . database.db import engine,Base
@@ -35,6 +35,10 @@ app.mount("/static", StaticFiles(directory="app/static"))
 
 app.include_router(auth_routes.router)
 app.include_router(mock_routes.router)
+
+@app.get("/")
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 

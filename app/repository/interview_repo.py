@@ -1,7 +1,7 @@
 from ..models.interview import Interview
 from ..models.interview_turn import InterviewTurn
 from ..models.interview_evaluation import InterviewEvaluation
-from app.models import interview
+from sqlalchemy import func
 
 def create_interview_in_db(db, user_id, interview_type, difficulty, mode, language):
     interview=Interview(user_id=user_id,
@@ -82,3 +82,53 @@ def update_interview_status(db,interview_id,status):
         interview.status=status
     db.commit()
     db.refresh(interview)
+
+def get_user_interviews(db, user_id):
+    return (
+        db.query(Interview)
+        .filter(Interview.user_id == user_id)
+        .order_by(Interview.created_at.desc())
+        .all()
+    )
+
+def get_evaluation_from_db(db, interview_id,user_id):
+    return (
+        db.query(InterviewEvaluation)
+        .join(Interview)
+        .filter(Interview.interview_id == interview_id, Interview.user_id == user_id)
+        .first()
+    )
+
+def get_avg_scores(db,user_id):
+    overall_avg = (
+        db.query(func.avg(InterviewEvaluation.score))
+        .join(Interview, InterviewEvaluation.interview_id == Interview.interview_id)
+        .filter(Interview.user_id == user_id)
+        .scalar()
+    )
+    print(overall_avg)
+    return round(overall_avg,2)
+
+
+def recent_3_avg_score(db, user_id):
+
+    recent_scores = (
+        db.query(InterviewEvaluation.score)
+        .join(Interview, InterviewEvaluation.interview_id == Interview.interview_id)
+        .filter(
+            Interview.user_id == user_id,
+            InterviewEvaluation.score != None
+        )
+        .order_by(Interview.created_at.desc())
+        .limit(3)
+        .all()
+    )
+
+    if not recent_scores:
+        return None
+
+    scores = [s[0] for s in recent_scores]
+
+    avg = sum(scores) / len(scores)
+    print(avg)
+    return round(avg, 2)
