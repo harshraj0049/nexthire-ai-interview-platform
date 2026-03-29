@@ -82,20 +82,20 @@ It is a **full-stack, production-grade interview simulation system** that replic
 ---
  
 ## Interview Types Supported
- 
+
 NextHire.AI supports **8 distinct interview domains**, each with a customized LLM prompt persona and question strategy:
- 
-| # | Domain 
-|---|
-| 1 | **DSA / Coding** |
-| 2 | **System Design** |
-| 3 | **HR / Behavioral** |
-| 4 | **Data Science** |
-| 5 | **Product Manager** |
-| 6 | **DevOps** |
-| 7 | **Business Analytics** | 
-| 8 | **SQL Developer** |
- 
+
+| # | Domain | Type |
+|---|---|---|
+| 1 | **DSA / Coding** | Technical |
+| 2 | **System Design** | Technical |
+| 3 | **HR / Behavioral** | Non-Technical |
+| 4 | **Data Science** | Technical |
+| 5 | **Product Manager** | Non-Technical |
+| 6 | **DevOps** | Technical |
+| 7 | **Business Analytics** | Non-Technical |
+| 8 | **SQL Developer** | Technical |
+
 ---
  
 ## System Architecture
