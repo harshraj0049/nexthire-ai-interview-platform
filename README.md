@@ -56,7 +56,7 @@ It is a **full-stack, production-grade interview simulation system** that replic
 ## Platform Screenshots
  
 > **Landing Page**
-><img src="./app/static/images/">
+><img src="./app/static/images/landing.png">
  
 > **User Dashboard** 
 ><img src="./app/static/images/dashborad.png">
@@ -64,8 +64,14 @@ It is a **full-stack, production-grade interview simulation system** that replic
 > **Live Interview Screen** — multi-turn conversation in progress
 ><img src="./app/static/images/interview_ui.png">
   
-> **Evaluation Popup** — score, strengths, weaknesses, improvements, final verdict
-><img src="./app/static/images/eval_1.png"><img src="./app/static/images/eval_2.png">
+**Evaluation Popup** — score, strengths, weaknesses, improvements, final verdict
+
+<table>
+  <tr>
+    <td><img src="./app/static/images/eval_1.png" width="400"></td>
+    <td><img src="./app/static/images/eval_2.png" width="400"></td>
+  </tr>
+</table>
  
 > **Interview History Dashboard** — list of past interviews with scores  
 ><img src="./app/static/images/history.png">
