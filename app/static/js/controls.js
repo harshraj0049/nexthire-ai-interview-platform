@@ -190,7 +190,7 @@ function speakReply(text) {
     const speech = new SpeechSynthesisUtterance(text);
     speech.lang = "en-US";
     speech.pitch = 1;
-    speech.rate = 1;
+    speech.rate = 1.2;
 
     window.speechSynthesis.speak(speech);
 }
