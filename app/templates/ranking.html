@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking - NextHire.AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-slate-100">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Navigation breadcrumb -->
+        <div class="mb-8 flex items-center gap-2 text-sm text-slate-400">
+            <a href="/" class="hover:text-slate-300 transition">Dashboard</a>
+            <span>/</span>
+            <span class="text-slate-100">Ranking</span>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-10">
+            <h1 class="text-3xl font-bold text-slate-100 mb-2">Global Rankings</h1>
+            <p class="text-slate-400">Compare your performance with other candidates</p>
+        </div>
+
+        <!-- Filter -->
+        <div class="mb-8 bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+            <h3 class="text-slate-100 font-semibold mb-4">Filter by Interview Type</h3>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="filterRanking('')" class="filter-btn active bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-blue-700">
+                    All Types
+                </button>
+                <button onclick="filterRanking('dsa')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    Technical (SWE)
+                </button>
+                <button onclick="filterRanking('hr')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    HR & Behavioral
+                </button>
+                <button onclick="filterRanking('ml')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    Data Science & ML
+                </button>
+                <button onclick="filterRanking('sql')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    SQL Developer
+                </button>
+                <button onclick="filterRanking('devops')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    DevOps & SRE
+                </button>
+                <button onclick="filterRanking('pm')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    Product Manager
+                </button>
+                <button onclick="filterRanking('system')" class="filter-btn bg-slate-700/50 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-600">
+                    System Design
+                </button>
+            </div>
+        </div>
+
+        <!-- Your Rank Card -->
+        <div id="userRankCard" class="mb-10 bg-gradient-to-br from-blue-900/40 to-purple-900/40 border border-blue-500/30 rounded-lg p-8 backdrop-blur-sm">
+            <div class="text-center">
+                <h3 class="text-slate-400 text-sm font-semibold mb-4">YOUR RANK</h3>
+                <div class="flex items-center justify-center gap-8 mb-6">
+                    <div>
+                        <p class="text-slate-400 text-sm mb-1">Rank</p>
+                        <p id="userRank" class="text-5xl font-bold text-blue-400">#12</p>
+                    </div>
+                    <div class="w-px h-16 bg-slate-700/50"></div>
+                    <div>
+                        <p class="text-slate-400 text-sm mb-1">Average Score</p>
+                        <p id="userScore" class="text-5xl font-bold text-green-400">78</p>
+                    </div>
+                    <div class="w-px h-16 bg-slate-700/50"></div>
+                    <div>
+                        <p class="text-slate-400 text-sm mb-1">Interviews</p>
+                        <p id="userInterviews" class="text-5xl font-bold text-purple-400">23</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-700/50">
+                    <div>
+                        <p class="text-slate-400 text-xs mb-1">Percentile</p>
+                        <p id="userPercentile" class="text-lg font-semibold text-slate-100">Top 12%</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-xs mb-1">Best Score</p>
+                        <p id="userBestScore" class="text-lg font-semibold text-green-400">95</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-xs mb-1">Improvement</p>
+                        <p id="userImprovement" class="text-lg font-semibold text-green-400">+12%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+            <h3 class="text-slate-100 font-semibold mb-6">Top 50 Candidates</h3>
+            
+            <!-- Table Header -->
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-slate-700/50">
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">Rank</th>
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">User</th>
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">Avg Score</th>
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">Interviews</th>
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">Best Score</th>
+                            <th class="text-left py-3 px-4 text-slate-400 text-sm font-semibold">Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardTable">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data generator
+        const interviewTypes = ['dsa', 'hr', 'ml', 'sql', 'devops', 'pm', 'system'];
+        const typeNames = {
+            'dsa': 'Technical Interview (SWE)',
+            'hr': 'HR & Behavioral',
+            'ml': 'Data Science & ML',
+            'sql': 'SQL Developer',
+            'devops': 'DevOps & SRE',
+            'pm': 'Product Manager',
+            'system': 'System Design'
+        };
+
+        const names = [
+            'Aarjav Patel', 'Bhavna Sharma', 'Chirag Gupta', 'Divya Desai', 'Esha Nair',
+            'Farhan Khan', 'Gitika Roy', 'Harsh Verma', 'Ishita Singh', 'Jaidev Kumar',
+            'Kavya Menon', 'Lalit Joshi', 'Manya Kapoor', 'Nirav Pandey', 'Ojas Sinha',
+            'Priya Bhat', 'Quincy D\'Silva', 'Rahul Reddy', 'Sanya Malhotra', 'Tarun Negi',
+            'Ushma Patel', 'Vihaan Chopra', 'Wajid Hassan', 'Xavier Lee', 'Yashika Saxena',
+            'Zara Khan', 'Arjun Singh', 'Basil Jacob', 'Chitra Kapoor', 'Daksh Rajpurohit',
+            'Eshita Gupta', 'Farah Ali', 'Gaurav Saxena', 'Hina Kapadia', 'Ishan Bhatt',
+            'Jasmine Patel', 'Karan Malhotra', 'Laxmi Sharma', 'Madhav Nair', 'Nisha Roy',
+            'Omkar Joshi', 'Pankaj Singh', 'Qasim Ahmed', 'Roshan Kumar', 'Sneha Desai',
+            'Tanvi Bhat', 'Uday Sharma', 'Vidya Menon', 'Wig Patel', 'Yash Kapoor'
+        ];
+
+        function generateUserData(userId) {
+            const interviews = [];
+            let totalScore = 0;
+            let totalInterviews = 0;
+            let bestScore = 0;
+            let passCount = 0;
+
+            interviewTypes.forEach(type => {
+                const count = Math.floor(Math.random() * 15) + 1;
+                for (let i = 0; i < count; i++) {
+                    const score = Math.floor(Math.random() * 45) + 50;
+                    interviews.push({
+                        type: type,
+                        score: score,
+                        passed: score >= 70
+                    });
+                    totalScore += score;
+                    totalInterviews++;
+                    if (score > bestScore) bestScore = score;
+                    if (score >= 70) passCount++;
+                }
+            });
+
+            const avgScore = totalInterviews > 0 ? Math.round(totalScore / totalInterviews) : 0;
+
+            return {
+                id: userId,
+                name: names[userId % names.length],
+                avgScore: avgScore,
+                interviews: totalInterviews,
+                bestScore: bestScore,
+                trend: Math.floor(Math.random() * 20) - 5
+            };
+        }
+
+        function generateLeaderboardData() {
+            const users = [];
+            for (let i = 0; i < 50; i++) {
+                users.push(generateUserData(i));
+            }
+            users.sort((a, b) => b.avgScore - a.avgScore);
+            return users;
+        }
+
+        const leaderboardData = generateLeaderboardData();
+        const currentUser = generateUserData(999);
+        let filteredType = '';
+
+        function getFilteredLeaderboard(type) {
+            if (!type) return leaderboardData;
+
+            // For filtered view, we need to recalculate based on interview type
+            // This is simplified - in real app, you'd filter actual interview data
+            return leaderboardData.map(user => {
+                const filtered = {
+                    ...user,
+                    avgScore: Math.round(user.avgScore * (0.8 + Math.random() * 0.4)),
+                    interviews: Math.floor(user.interviews * (0.3 + Math.random() * 0.7))
+                };
+                return filtered;
+            }).sort((a, b) => b.avgScore - a.avgScore);
+        }
+
+        function getCurrentUserRank(type) {
+            const filtered = getFilteredLeaderboard(type);
+            let userRank = filtered.findIndex(u => u.id === 999) + 1;
+            if (userRank === 0) userRank = Math.floor(Math.random() * 15) + 1;
+            return userRank;
+        }
+
+        function updateUserRankCard() {
+            const filtered = getFilteredLeaderboard(filteredType);
+            const userRank = getCurrentUserRank(filteredType);
+            const totalUsers = filtered.length;
+            const percentile = Math.round(((totalUsers - userRank + 1) / totalUsers) * 100);
+
+            document.getElementById('userRank').textContent = '#' + userRank;
+            document.getElementById('userScore').textContent = currentUser.avgScore;
+            document.getElementById('userInterviews').textContent = currentUser.interviews;
+            document.getElementById('userPercentile').textContent = 'Top ' + percentile + '%';
+            document.getElementById('userBestScore').textContent = currentUser.bestScore;
+            document.getElementById('userImprovement').textContent = (currentUser.trend >= 0 ? '+' : '') + currentUser.trend + '%';
+        }
+
+        function updateLeaderboard() {
+            const filtered = getFilteredLeaderboard(filteredType);
+            const tbody = document.getElementById('leaderboardTable');
+            tbody.innerHTML = '';
+
+            const userRank = getCurrentUserRank(filteredType);
+
+            filtered.slice(0, 50).forEach((user, index) => {
+                const rank = index + 1;
+                const isCurrentUser = user.id === 999;
+                const row = document.createElement('tr');
+                row.className = isCurrentUser 
+                    ? 'border-b border-slate-700/50 bg-blue-900/20 hover:bg-blue-900/30 transition'
+                    : 'border-b border-slate-700/50 hover:bg-slate-700/20 transition';
+
+                const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+
+                row.innerHTML = `
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">${medalEmoji}</span>
+                            <span class="text-slate-100 font-semibold">${rank}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm">
+                                ${user.name.charAt(0)}
+                            </div>
+                            <div>
+                                <p class="text-slate-100 font-medium">${user.name}${isCurrentUser ? ' (You)' : ''}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">⭐</span>
+                            <span class="text-slate-100 font-semibold">${user.avgScore}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-4 text-slate-300">${user.interviews}</td>
+                    <td class="py-4 px-4">
+                        <span class="text-green-400 font-semibold">${user.bestScore}</span>
+                    </td>
+                    <td class="py-4 px-4">
+                        <span class="${user.trend >= 0 ? 'text-green-400' : 'text-red-400'} font-semibold">
+                            ${user.trend >= 0 ? '↑' : '↓'} ${Math.abs(user.trend)}%
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function filterRanking(type) {
+            filteredType = type;
+
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-slate-700/50', 'text-slate-300');
+            });
+
+            event.target.classList.remove('bg-slate-700/50', 'text-slate-300');
+            event.target.classList.add('active', 'bg-blue-600', 'text-white');
+
+            updateUserRankCard();
+            updateLeaderboard();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUserRankCard();
+            updateLeaderboard();
+        });
+    </script>
+</body>
+</html>

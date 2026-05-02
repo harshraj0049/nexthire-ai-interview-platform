@@ -15,14 +15,7 @@ body{
     justify-content: center;
     align-items: center;
 }
-#side_img{
-    width: 50%;
-    height: 100vh;
-}
-#myimg{
-    height: 100%;
-    width: 100%;
-}
+
 .form_container{
     background-color: hsla(0, 0%, 0%, 0.35);
     backdrop-filter: blur(10px);
@@ -102,4 +95,77 @@ form input{
 .flash.warning{ background:#facc15; color:black; }
 .flash.info{ background:#1e293b; }
 
+#side_img {
+    width: 50%;
+    height: 100vh;
+    background-image: url('/static/images/side_img.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+}
 
+.side_content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.brand {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-family: "Inter", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: white;
+}
+
+.brand_ai {
+    color: #00aaff;
+}
+
+.headline {
+    font-family: "Inter", sans-serif;
+    font-size: 3.0rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1.2;
+}
+
+.headline_blue {
+    color: #00aaff;
+}
+
+.sub_text {
+    font-family: "DM Sans", sans-serif;
+    font-size: 0.95rem;
+    color: white;
+    line-height: 1.5;
+    max-width: 420px; 
+}
+
+.status_badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: "Inter", sans-serif;
+    font-size: 0.85rem;
+    color: white;
+    width: fit-content;
+    margin-top: 8px;
+}
+
+.green_dot {
+    width: 10px;
+    height: 10px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    display: inline-block;
+}

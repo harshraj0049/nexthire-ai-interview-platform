@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from . database.db import engine,Base
 from . auth import routes as auth_routes
 from . mock_interview import routes as mock_routes
+from .analytics import routes as analytics_routes
 import logging
 from dotenv import load_dotenv
 from slowapi.errors import RateLimitExceeded
@@ -35,7 +36,7 @@ app.mount("/static", StaticFiles(directory="app/static"))
 
 app.include_router(auth_routes.router)
 app.include_router(mock_routes.router)
-
+app.include_router(analytics_routes.router)
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})

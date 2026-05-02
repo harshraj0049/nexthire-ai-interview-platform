@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress - NextHire.AI</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen text-slate-100">
+    <script id="data-timeline" type="application/json">{{ timeline_data | tojson }}</script>
+    <script id="data-bytype"   type="application/json">{{ by_type_data  | tojson }}</script>
+    <script id="data-summary" type="application/json">{"totalInterviews": {{ total_interviews }}, "avgScore": {{ avg_score }}, "improvementTrend": {{ improvement_trend }}}</script>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+
+        <!-- Breadcrumb -->
+        <div class="mb-8 flex items-center gap-2 text-sm text-slate-400">
+            <a href="/auth/dash" class="hover:text-slate-300 transition">Dashboard</a>
+            <span>/</span>
+            <span class="text-slate-100">Progress</span>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-10">
+            <h1 class="text-3xl font-bold text-slate-100 mb-2">Your Progress</h1>
+            <p class="text-slate-400">Track your interview performance and improvement over time</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Total Interviews</p>
+                        <p id="totalInterviews" class="text-3xl font-bold text-slate-100">{{ total_interviews }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Average Score</p>
+                        <p id="avgScore" class="text-3xl font-bold text-slate-100">{{ avg_score }}</p>
+                        <p class="text-xs text-slate-400 mt-1">out of 100</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                        <span class="text-2xl">⭐</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm font-medium mb-2">Improvement Trend</p>
+                        {# Jinja2 handles the sign and colour – no JS needed for first render #}
+                        <p id="improvementTrend"
+                           class="text-3xl font-bold {% if improvement_trend >= 0 %}text-green-400{% else %}text-red-400{% endif %}">
+                            {% if improvement_trend >= 0 %}+{% endif %}{{ improvement_trend }}%
+                        </p>
+                        <p class="text-xs text-slate-400 mt-1">vs previous period</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                        <span class="text-2xl">📈</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Filters -->
+        <div class="mb-8 bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+            <h3 class="text-slate-100 font-semibold mb-4">Filters</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-slate-400 text-sm font-medium mb-2">Time Period</label>
+                    <select id="timelineFilter"
+                            class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2
+                                   text-slate-100 text-sm focus:outline-none focus:border-blue-500 transition">
+                        <option value="60">2 Months (60 days)</option>
+                        <option value="180">6 Months (180 days)</option>
+                        <option value="270">9 Months (270 days)</option>
+                        <option value="365">1 Year (365 days)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-400 text-sm font-medium mb-2">Interview Type</label>
+                    <select id="typeFilter"
+                            class="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2
+                                   text-slate-100 text-sm focus:outline-none focus:border-blue-500 transition">
+                        <option value="">All Types</option>
+                        <option value="dsa">Technical Interview (SWE)</option>
+                        <option value="hr">HR &amp; Behavioral</option>
+                        <option value="ml">Data Science &amp; ML</option>
+                        <option value="sql">SQL Developer</option>
+                        <option value="devops">DevOps &amp; SRE</option>
+                        <option value="pm">Product Manager</option>
+                        <option value="system">System Design</option>
+                    </select>
+                </div>
+
+            </div>
+            <button onclick="applyFilters()"
+                    class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition">
+                Apply Filters
+            </button>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+                <h3 class="text-slate-100 font-semibold mb-4">Score Timeline</h3>
+                <canvas id="timelineChart"></canvas>
+            </div>
+
+            <div class="bg-slate-800/40 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
+                <h3 class="text-slate-100 font-semibold mb-4">Performance by Interview Type</h3>
+                <canvas id="typeChart"></canvas>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ── Read server data injected via <script type="application/json"> ────
+        // This completely avoids any Jinja2 / JS brace collision.
+        const initTimeline = JSON.parse(document.getElementById('data-timeline').textContent);
+        const initByType   = JSON.parse(document.getElementById('data-bytype').textContent);
+        const initSummary  = JSON.parse(document.getElementById('data-summary').textContent);
+
+        let timelineChart = null;
+        let typeChart     = null;
+
+        // ── Fetch helper ──────────────────────────────────────────────────────
+        // Cookie-based auth: the JWT cookie is sent automatically by the browser
+        // because credentials:'same-origin' is set. No Authorization header needed.
+        async function apiFetch(url) {
+            const res = await fetch(url, { credentials: 'same-origin' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+        }
+
+        // ── Render helpers ────────────────────────────────────────────────────
+        function renderSummary(data) {
+            document.getElementById('totalInterviews').textContent = data.totalInterviews;
+            document.getElementById('avgScore').textContent        = Math.round(data.avgScore);
+
+            const el = document.getElementById('improvementTrend');
+            const t  = data.improvementTrend;
+            el.textContent = (t >= 0 ? '+' : '') + t + '%';
+            el.className   = 'text-3xl font-bold ' + (t >= 0 ? 'text-green-400' : 'text-red-400');
+        }
+
+        function renderTimeline(rows) {
+            // rows: [{date, avgScore, count}, ...]  already aggregated by the backend
+            const labels = rows.map(r => r.date);
+            const scores = rows.map(r => r.avgScore);
+
+            if (timelineChart) {
+                timelineChart.data.labels           = labels;
+                timelineChart.data.datasets[0].data = scores;
+                timelineChart.update();
+                return;
+            }
+
+            timelineChart = new Chart(
+                document.getElementById('timelineChart').getContext('2d'),
+                {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label:                'Average Score',
+                            data:                 scores,
+                            borderColor:          '#3b82f6',
+                            backgroundColor:      'rgba(59,130,246,0.1)',
+                            borderWidth:          2,
+                            tension:              0.4,
+                            fill:                 true,
+                            pointRadius:          3,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor:     '#1e293b',
+                            pointBorderWidth:     2,
+                        }],
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                min: 0, max: 100,
+                                grid:  { color: 'rgba(148,163,184,0.1)' },
+                                ticks: { color: '#94a3b8' },
+                            },
+                            x: {
+                                grid:  { display: false },
+                                ticks: { color: '#94a3b8', maxTicksLimit: 10 },
+                            },
+                        },
+                    },
+                }
+            );
+        }
+
+        const TYPE_COLORS = ['#3b82f6','#ec4899','#6366f1','#10b981','#f59e0b','#8b5cf6','#06b6d4'];
+
+        function renderByType(byType) {
+            // byType: { dsa: {typeName, avgScore, count}, hr: {...}, ... }
+            const keys   = Object.keys(byType);
+            const labels = keys.map(k => byType[k].typeName);
+            const scores = keys.map(k => byType[k].avgScore);
+            const colors = TYPE_COLORS.slice(0, keys.length);
+
+            if (typeChart) {
+                typeChart.data.labels                      = labels;
+                typeChart.data.datasets[0].data            = scores;
+                typeChart.data.datasets[0].backgroundColor = colors;
+                typeChart.update();
+                return;
+            }
+
+            typeChart = new Chart(
+                document.getElementById('typeChart').getContext('2d'),
+                {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label:           'Average Score',
+                            data:            scores,
+                            backgroundColor: colors,
+                            borderRadius:    6,
+                            borderSkipped:   false,
+                        }],
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                min: 0, max: 100,
+                                grid:  { color: 'rgba(148,163,184,0.1)' },
+                                ticks: { color: '#94a3b8' },
+                            },
+                            y: {
+                                grid:  { display: false },
+                                ticks: { color: '#94a3b8' },
+                            },
+                        },
+                    },
+                }
+            );
+        }
+
+        // ── Apply Filters button ──────────────────────────────────────────────
+        async function applyFilters() {
+            const days = document.getElementById('timelineFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const typeParam = type ? `&type=${type}` : '';
+
+            try {
+                const [summary, timeline, byType] = await Promise.all([
+                    apiFetch(`/api/analytics/summary?days=${days}${typeParam}`),
+                    apiFetch(`/api/analytics/timeline?days=${days}${typeParam}`),
+                    apiFetch(`/api/analytics/by-type?days=${days}`),
+                ]);
+
+                renderSummary(summary);
+                renderTimeline(timeline.timeline);
+                renderByType(byType.byType);
+
+            } catch (err) {
+                console.error('Filter update failed:', err);
+                showError('Failed to load data. Please try again.');
+            }
+        }
+
+        // ── Error toast ───────────────────────────────────────────────────────
+        function showError(msg) {
+            const el = Object.assign(document.createElement('div'), {
+                className:   'fixed top-4 right-4 bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-200 max-w-sm z-50',
+                textContent: msg,
+            });
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 5000);
+        }
+
+        // ── First paint: use server-rendered data, zero extra requests ─────────
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTimeline(initTimeline);
+            renderByType(initByType);
+            // Summary card text is already in the HTML from Jinja2, no JS call needed
+        });
+    </script>
+</body>
+</html>
